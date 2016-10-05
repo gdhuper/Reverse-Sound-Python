@@ -19,22 +19,39 @@ class Reverse():
     def open_read_file(self, ifile, ofile):
         s = Stack()
         fileIn = open(self.ifile, "r")
-        #fileOut = open(self.ofile, "w")
+        fileOut = open(self.ofile, "w")
 
-        str = fileIn.readline()
+        strTemp = fileIn.readline()
         list = []
-        list = str.split(" ")
+        list = strTemp.split(" ")
         sampleRate = list[3]
         counter = 0
-        while fileIn.readline() != None:
-            strtemp = fileIn.readline()
-            if 'str' in strtemp:
+        for line in fileIn:
+            if line == " " or line == "":
                 break
             else:
-                print(strtemp)
-                counter += 1
-        print(counter)
+                tempList = line.split(" ")
+                if tempList[0] == ";":
+                    continue
+                else:
+                    tempL = []
+                    for l in tempList:
+                        if l != "":
+                            tempL.append(l)
+                        else:
+                            continue
+                    s.push(tempL[1])
+                    counter += 1
+        numSteps = 0
+        tempsamplerate = float(sampleRate)
+        fileOut.write("; Sample Rate " + sampleRate)
+        while s.size() > 0:
+            fileOut.write(str((float(numSteps) / tempsamplerate)) + "\t" + s.peek() + "\n")
+            s.pop()
+            numSteps += 1
 
+        fileIn.close()
+        fileOut.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Read and write file')
@@ -43,8 +60,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-
-    r = Reverse(args.ifile, args.ofile)
+    r = Reverse(args.ifile, args.ofile)  #creating Reverse object with input and output files
     r.open_read_file(ifile, ofile)
 
 
